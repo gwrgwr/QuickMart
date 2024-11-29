@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
-@Entity
+@MappedSuperclass
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,30 +21,78 @@ public class UserEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "user_id")
     private String id;
 
     private String name;
 
-    private String user;
+    private String email;
+
+    private String username;
 
     private String password;
 
+    @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    private LocalDate createdAt;
+
+    private LocalDate updatedAt;
+
+    public UserEntity(String name, String email, String username, String password, UserRole role) {
+        this.name = name;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.createdAt = LocalDate.now();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        setTimestamps();
+        encryptPassword();
+    }
+
+    private void setTimestamps() {
+        this.createdAt = LocalDate.now();
+        this.updatedAt = LocalDate.now();
+    }
+
+    private void encryptPassword() {
+        if (this.password != null) {
+            this.password = new BCryptPasswordEncoder().encode(this.password);
+        }
+    }
+
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDate.now();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(Objects.equals(role.getRole(), "CLIENT")) {
-            return List.of(() -> "SCOPE_CLIENT");
-        }
-        if(Objects.equals(role.getRole(), "SELLER")) {
-            return List.of(() -> "SCOPE_SELLER");
-        }
-        return List.of(() -> "SCOPE_GUEST");
+        return switch (role) {
+            case ADMIN -> List.of(
+                    () -> "SCOPE_ADMIN",
+                    () -> "SCOPE_CLIENT",
+                    () -> "SCOPE_SELLER",
+                    () -> "SCOPE_GUEST"
+            );
+            case CLIENT -> List.of(
+                    () -> "SCOPE_CLIENT",
+                    () -> "SCOPE_GUEST"
+            );
+            case SELLER -> List.of(
+                    () -> "SCOPE_SELLER",
+                    () -> "SCOPE_GUEST"
+            );
+            default -> List.of(() -> "SCOPE_GUEST");
+        };
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return username;
     }
 }
