@@ -2,8 +2,8 @@ package com.example.quickmart.service;
 
 import com.example.quickmart.domain.client.Client;
 import com.example.quickmart.domain.seller.Seller;
-import com.example.quickmart.domain.user.LoginRequestDTO;
-import com.example.quickmart.domain.user.LoginResponseDTO;
+import com.example.quickmart.domain.user.dto.request.LoginRequestDTO;
+import com.example.quickmart.domain.user.dto.response.LoginResponseDTO;
 import com.example.quickmart.domain.user.UserEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

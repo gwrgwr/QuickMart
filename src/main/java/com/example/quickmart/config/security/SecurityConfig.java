@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("api/v1/auth/login", "api/v1/user/register").permitAll()
+                        .requestMatchers("api/v1/auth/login", "api/v1/seller").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(auth -> auth.jwt(Customizer.withDefaults()))
                 .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
@@ -56,7 +56,6 @@ public class SecurityConfig {
         return RoleHierarchyImpl.withRolePrefix("SCOPE_")
                 .role("ADMIN").implies("SELLER")
                 .role("SELLER").implies("CLIENT")
-                .role("CLIENT").implies("GUEST")
                 .build();
     }
 

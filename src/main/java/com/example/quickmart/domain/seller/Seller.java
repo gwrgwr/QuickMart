@@ -19,7 +19,12 @@ public class Seller extends UserEntity {
     @JoinColumn(name = "product_id")
     private List<Product> products;
 
-    private Integer salesQuantity;
+    private Integer salesQuantity = 0;
 
-    private Double rating;
+    private Double rating = 0.0;
+
+    public Seller(String name, String username, String email, String password) {
+        super(name, username, email, password, UserRole.SELLER);
+
+    }
 }

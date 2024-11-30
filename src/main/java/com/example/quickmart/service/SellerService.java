@@ -2,6 +2,10 @@ package com.example.quickmart.service;
 
 import com.example.quickmart.domain.product.Product;
 import com.example.quickmart.domain.seller.Seller;
+import com.example.quickmart.domain.seller.dto.request.SellerSaveDTO;
+import com.example.quickmart.domain.seller.dto.request.SellerUpdateDTO;
+import com.example.quickmart.domain.seller.dto.response.SellerResponseDTO;
+import com.example.quickmart.mapper.SellerMapper;
 import com.example.quickmart.repositories.SellerRepository;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +28,8 @@ public class SellerService {
         }
     }
 
-    public Seller getSellerByName(String name) {
-        return this.sellerRepository.findByUsernameLike(name).orElseThrow();
+    public SellerResponseDTO getSellerByName(String name) {
+        return this.sellerRepository.findByEmail(name).map(SellerMapper::toSellerResponseDTO).orElseThrow();
     }
 
     public Seller getSellerByEmail(String email) {
@@ -36,8 +40,19 @@ public class SellerService {
         return this.sellerRepository.findById(id).orElseThrow();
     }
 
-    public Seller saveSeller(Seller seller) {
-        return this.sellerRepository.save(seller);
+    public SellerResponseDTO saveSeller(SellerSaveDTO data) {
+        Seller seller = new Seller(data.name(), data.username(), data.email(), data.password());
+        this.sellerRepository.save(seller);
+        return SellerMapper.toSellerResponseDTO(seller);
+    }
+
+    public SellerResponseDTO updateSeller(String sellerId, SellerUpdateDTO data) {
+        Seller seller = this.getSellerById(sellerId);
+        seller.setName(data.name());
+        seller.setUsername(data.username());
+        seller.setEmail(data.email());
+        this.sellerRepository.save(seller);
+        return SellerMapper.toSellerResponseDTO(seller);
     }
 
     public void deleteSeller(String sellerId) {

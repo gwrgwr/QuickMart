@@ -1,7 +1,7 @@
 package com.example.quickmart.controllers;
 
-import com.example.quickmart.domain.user.LoginRequestDTO;
-import com.example.quickmart.domain.user.LoginResponseDTO;
+import com.example.quickmart.domain.user.dto.request.LoginRequestDTO;
+import com.example.quickmart.domain.user.dto.response.LoginResponseDTO;
 import com.example.quickmart.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;

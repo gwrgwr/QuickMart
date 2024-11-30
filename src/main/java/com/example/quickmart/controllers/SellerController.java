@@ -2,8 +2,14 @@ package com.example.quickmart.controllers;
 
 import com.example.quickmart.domain.product.Product;
 import com.example.quickmart.domain.seller.Seller;
+import com.example.quickmart.domain.seller.dto.request.SellerSaveDTO;
+import com.example.quickmart.domain.seller.dto.request.SellerUpdateDTO;
+import com.example.quickmart.domain.seller.dto.response.SellerResponseDTO;
+import com.example.quickmart.mapper.SellerMapper;
 import com.example.quickmart.service.SellerService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,26 +30,29 @@ public class SellerController {
     }
 
     @GetMapping("name/{sellerName}")
-    public Seller getSellerByName(@PathVariable String sellerName) {
-        return this.sellerService.getSellerByName(sellerName);
+    public ResponseEntity<SellerResponseDTO> getSellerByName(@PathVariable String sellerName) {
+        return ResponseEntity.ok(this.sellerService.getSellerByName(sellerName));
     }
 
     @GetMapping("email/{sellerEmail}")
-    public Seller getSellerByEmail(@PathVariable String sellerEmail) {
-        return this.sellerService.getSellerByEmail(sellerEmail);
+    public ResponseEntity<SellerResponseDTO> getSellerByEmail(@PathVariable String sellerEmail) {
+        return ResponseEntity.ok(SellerMapper.toSellerResponseDTO(this.sellerService.getSellerByEmail(sellerEmail)));
     }
 
     @PostMapping
-    public Seller addSeller(@RequestBody Seller seller) {
-        return this.sellerService.saveSeller(seller);
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<SellerResponseDTO> addSeller(@RequestBody SellerSaveDTO data) {
+        return ResponseEntity.ok(this.sellerService.saveSeller(data));
     }
 
     @PutMapping("{sellerId}")
-    public Seller updateSeller(@PathVariable String sellerId, @RequestBody Seller seller) {
-        return this.sellerService.saveSeller(seller);
+    @PreAuthorize("hasAuthority('SCOPE_SELLER')")
+    public ResponseEntity<SellerResponseDTO> updateSeller(@PathVariable String sellerId, @RequestBody SellerUpdateDTO data) {
+        return ResponseEntity.ok(this.sellerService.updateSeller(sellerId, data));
     }
 
     @DeleteMapping("{sellerId}")
+    @PreAuthorize("hasAuthority('SCOPE_SELLER')")
     public void deleteSeller(@PathVariable String sellerId) {
         this.sellerService.deleteSeller(sellerId);
     }

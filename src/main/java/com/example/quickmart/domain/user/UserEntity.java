@@ -44,7 +44,6 @@ public class UserEntity implements UserDetails {
         this.username = username;
         this.password = password;
         this.role = role;
-        this.createdAt = LocalDate.now();
     }
 
     @PrePersist
@@ -76,18 +75,12 @@ public class UserEntity implements UserDetails {
             case ADMIN -> List.of(
                     () -> "SCOPE_ADMIN",
                     () -> "SCOPE_CLIENT",
-                    () -> "SCOPE_SELLER",
-                    () -> "SCOPE_GUEST"
-            );
+                    () -> "SCOPE_SELLER");
             case CLIENT -> List.of(
-                    () -> "SCOPE_CLIENT",
-                    () -> "SCOPE_GUEST"
+                    () -> "SCOPE_CLIENT"
             );
             case SELLER -> List.of(
-                    () -> "SCOPE_SELLER",
-                    () -> "SCOPE_GUEST"
-            );
-            default -> List.of(() -> "SCOPE_GUEST");
+                    () -> "SCOPE_SELLER");
         };
     }
 
