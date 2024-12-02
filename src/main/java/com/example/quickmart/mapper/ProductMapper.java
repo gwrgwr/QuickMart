@@ -1,7 +1,7 @@
 package com.example.quickmart.mapper;
 
 import com.example.quickmart.domain.product.Product;
-import com.example.quickmart.domain.product.dto.request.ProductSaveDTO;
+import com.example.quickmart.domain.product.dto.request.ProductRequestDTO;
 import com.example.quickmart.domain.product.dto.response.ProductResponseDTO;
 import com.example.quickmart.domain.seller.Seller;
 
@@ -20,8 +20,8 @@ public class ProductMapper {
         );
     }
 
-    public static ProductSaveDTO toProductSaveDTO(Product product) {
-        return new ProductSaveDTO(
+    public static ProductRequestDTO toProductSaveDTO(Product product) {
+        return new ProductRequestDTO(
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),
@@ -34,13 +34,13 @@ public class ProductMapper {
         return productList.stream().map(ProductMapper::toProductResponseDTO).toList();
     }
 
-    public static Product toProduct(ProductSaveDTO productSaveDTO, Seller seller) {
+    public static Product toProduct(ProductRequestDTO productRequest, Seller seller) {
         return new Product(
-                productSaveDTO.name(),
-                productSaveDTO.description(),
-                productSaveDTO.price(),
-                productSaveDTO.stock(),
-                productSaveDTO.category(),
+                productRequest.name(),
+                productRequest.description(),
+                productRequest.price(),
+                productRequest.stock(),
+                productRequest.category(),
                 seller
         );
     }

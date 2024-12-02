@@ -2,6 +2,7 @@ package com.example.quickmart.controllers;
 
 import com.example.quickmart.domain.user.dto.request.LoginRequestDTO;
 import com.example.quickmart.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +23,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @PreAuthorize("permitAll()")
+    @Operation(description = "Login", summary = "Login")
     public ResponseEntity<Object> login(@RequestBody LoginRequestDTO data) {
         return ResponseEntity.ok(authService.login(data));
     }

@@ -10,6 +10,10 @@ public class SellerMapper {
     }
 
     public static SellerUpdateDTO toSellerUpdateDTO(Seller seller) {
-        return new SellerUpdateDTO(seller.getFullName(), seller.getUsername(), seller.getEmail());
+        return new SellerUpdateDTO(seller.getFullName(), seller.getUsername(), seller.getEmail(), seller.getNickname());
+    }
+
+    public static Seller toSeller(SellerUpdateDTO sellerUpdateDTO) {
+        return new Seller(sellerUpdateDTO.name(), sellerUpdateDTO.username(), sellerUpdateDTO.email(), null, sellerUpdateDTO.nickname());
     }
 }

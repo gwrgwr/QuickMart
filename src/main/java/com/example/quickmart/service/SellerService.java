@@ -1,7 +1,7 @@
 package com.example.quickmart.service;
 
 import com.example.quickmart.domain.product.Product;
-import com.example.quickmart.domain.product.dto.request.ProductSaveDTO;
+import com.example.quickmart.domain.product.dto.request.ProductRequestDTO;
 import com.example.quickmart.domain.product.dto.response.ProductResponseDTO;
 import com.example.quickmart.domain.seller.Seller;
 import com.example.quickmart.domain.seller.dto.request.SellerSaveDTO;
@@ -10,7 +10,9 @@ import com.example.quickmart.domain.seller.dto.response.SellerResponseDTO;
 import com.example.quickmart.exceptions.seller.SellerNotFoundException;
 import com.example.quickmart.mapper.ProductMapper;
 import com.example.quickmart.mapper.SellerMapper;
+import com.example.quickmart.repositories.ProductRepository;
 import com.example.quickmart.repositories.SellerRepository;
+import com.example.quickmart.utils.ReflectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,11 +21,11 @@ import java.util.List;
 public class SellerService {
 
     private final SellerRepository sellerRepository;
-    private final ProductService productService;
+    private final ProductRepository productRepository;
 
-    public SellerService(SellerRepository sellerRepository, ProductService productService) {
+    public SellerService(SellerRepository sellerRepository, ProductRepository productRepository) {
         this.sellerRepository = sellerRepository;
-        this.productService = productService;
+        this.productRepository = productRepository;
     }
 
     private void validateProductBelongsToSeller(Product product, Seller seller) {
@@ -56,10 +58,7 @@ public class SellerService {
 
     public SellerResponseDTO updateSeller(String sellerId, SellerUpdateDTO data) {
         Seller seller = this.getSellerById(sellerId);
-        seller.setFullName(data.name());
-        seller.setUsername(data.username());
-        seller.setEmail(data.email());
-        this.sellerRepository.save(seller);
+        ReflectionUtils.updateEntitiesFields(seller, SellerMapper.toSeller(data));
         return SellerMapper.toSellerResponseDTO(seller);
     }
 
@@ -69,37 +68,36 @@ public class SellerService {
 
     // Product
 
-    public ProductResponseDTO getProductByName(String nickname, String name) {
+    public List<ProductResponseDTO> getProductsBySeller(String nickname) {
         Seller seller = this.getSellerByNickname(nickname);
-        Product product = this.productService.getProductByName(name);
-        validateProductBelongsToSeller(product, seller);
+        return ProductMapper.toProductResponseDTOList(this.productRepository.findBySeller(seller));
+    }
+
+    public ProductResponseDTO getProductBySeller(String sellerId, String productId) {
+        Seller seller = this.getSellerById(sellerId);
+        Product product = this.productRepository.findById(productId).orElseThrow(SellerNotFoundException::new);
+        this.validateProductBelongsToSeller(product, seller);
         return ProductMapper.toProductResponseDTO(product);
     }
 
-    public List<ProductResponseDTO> getProducts(String nickname) {
-        Seller seller = this.getSellerByNickname(nickname);
-        List<Product> productList = this.productService.getProductsBySeller(seller);
-        return ProductMapper.toProductResponseDTOList(productList);
-    }
-
-    public ProductResponseDTO addProduct(String nickname, ProductSaveDTO data) {
+    public ProductResponseDTO saveProduct(String nickname, ProductRequestDTO data) {
         Seller seller = this.getSellerByNickname(nickname);
         Product product = ProductMapper.toProduct(data, seller);
-        validateProductBelongsToSeller(product, seller);
-        return ProductMapper.toProductResponseDTO(this.productService.saveProduct(ProductMapper.toProductSaveDTO(product), seller));
+        return ProductMapper.toProductResponseDTO(this.productRepository.save(product));
     }
 
-    public ProductResponseDTO updateProduct(String nickname, String productId, Product product) {
-        Product existingProduct = this.productService.getProductById(productId);
+    public ProductResponseDTO updateProduct(String nickname, String productId, ProductRequestDTO data) {
         Seller seller = this.getSellerByNickname(nickname);
-        validateProductBelongsToSeller(existingProduct, seller);
-        return ProductMapper.toProductResponseDTO(this.productService.saveProduct(ProductMapper.toProductSaveDTO(product), seller));
+        Product product = this.productRepository.findById(productId).orElseThrow(SellerNotFoundException::new);
+        this.validateProductBelongsToSeller(product, seller);
+        ReflectionUtils.updateEntitiesFields(product, ProductMapper.toProduct(data, seller));
+        return ProductMapper.toProductResponseDTO(this.productRepository.save(product));
     }
 
     public void deleteProduct(String nickname, String productId) {
-        Product existingProduct = this.productService.getProductById(productId);
         Seller seller = this.getSellerByNickname(nickname);
-        validateProductBelongsToSeller(existingProduct, seller);
-        this.productService.deleteProduct(existingProduct, seller);
+        Product product = this.productRepository.findById(productId).orElseThrow(SellerNotFoundException::new);
+        this.validateProductBelongsToSeller(product, seller);
+        this.productRepository.delete(product);
     }
 }

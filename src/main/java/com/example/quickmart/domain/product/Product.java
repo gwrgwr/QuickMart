@@ -1,5 +1,6 @@
 package com.example.quickmart.domain.product;
 
+import com.example.quickmart.domain.image.ImageDB;
 import com.example.quickmart.domain.seller.Seller;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -21,6 +24,7 @@ public class Product {
     private String id;
 
     @NotNull(message = "Name cannot be null")
+    @Column(unique = true)
     private String name;
 
     @NotNull(message = "Description cannot be null")
@@ -41,6 +45,9 @@ public class Product {
 
     @Positive(message = "Rating must be positive")
     private Double rating;
+
+    @OneToMany(mappedBy = "product")
+    private List<ImageDB> image;
 
     public Product(String name, String description, Double price, Double stock, String category, Seller seller) {
         this.name = name;
