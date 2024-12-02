@@ -1,6 +1,7 @@
 package com.example.quickmart.service;
 
 import com.example.quickmart.domain.product.Product;
+import com.example.quickmart.domain.product.dto.request.ProductSaveDTO;
 import com.example.quickmart.domain.seller.Seller;
 import com.example.quickmart.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -23,9 +24,8 @@ public class ProductService {
         return this.productRepository.findByNameLike(name).orElseThrow();
     }
 
-    public Product saveProduct(Product product, Seller seller) {
-        product.setSeller(seller);
-        return this.productRepository.save(product);
+    public Product saveProduct(ProductSaveDTO data, Seller seller) {
+        return this.productRepository.save(new Product(data.name(), data.description(), data.price(), data.stock(), data.category(), seller));
     }
 
     public void deleteProduct(Product product, Seller seller) {

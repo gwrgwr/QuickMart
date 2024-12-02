@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -23,10 +24,12 @@ public class UserEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    private String name;
+    private String fullName;
 
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(unique = true, nullable = false)
     private String username;
 
     private String password;
@@ -38,10 +41,10 @@ public class UserEntity implements UserDetails {
 
     private LocalDate updatedAt;
 
-    public UserEntity(String name, String email, String username, String password, UserRole role) {
-        this.name = name;
-        this.email = email;
+    public UserEntity(String fullName, String username, String email, String password, UserRole role) {
+        this.fullName = fullName;
         this.username = username;
+        this.email = email;
         this.password = password;
         this.role = role;
     }

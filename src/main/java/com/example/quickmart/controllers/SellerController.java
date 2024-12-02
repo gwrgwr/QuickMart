@@ -1,6 +1,8 @@
 package com.example.quickmart.controllers;
 
 import com.example.quickmart.domain.product.Product;
+import com.example.quickmart.domain.product.dto.request.ProductSaveDTO;
+import com.example.quickmart.domain.product.dto.response.ProductResponseDTO;
 import com.example.quickmart.domain.seller.Seller;
 import com.example.quickmart.domain.seller.dto.request.SellerSaveDTO;
 import com.example.quickmart.domain.seller.dto.request.SellerUpdateDTO;
@@ -29,14 +31,14 @@ public class SellerController {
         return this.sellerService.getSellerById(sellerId);
     }
 
-    @GetMapping("name/{sellerName}")
-    public ResponseEntity<SellerResponseDTO> getSellerByName(@PathVariable String sellerName) {
-        return ResponseEntity.ok(this.sellerService.getSellerByName(sellerName));
+    @GetMapping("name/{sellerNickname}")
+    public ResponseEntity<SellerResponseDTO> getSellerByName(@PathVariable String sellerNickname) {
+        return ResponseEntity.ok(SellerMapper.toSellerResponseDTO(this.sellerService.getSellerByNickname(sellerNickname)));
     }
 
     @GetMapping("email/{sellerEmail}")
     public ResponseEntity<SellerResponseDTO> getSellerByEmail(@PathVariable String sellerEmail) {
-        return ResponseEntity.ok(SellerMapper.toSellerResponseDTO(this.sellerService.getSellerByEmail(sellerEmail)));
+        return ResponseEntity.ok(this.sellerService.getSellerByEmailForSearch(sellerEmail));
     }
 
     @PostMapping
@@ -58,36 +60,32 @@ public class SellerController {
     }
 
 
-
-
-
 // Products
 
 
-
-    @GetMapping("{sellerId}/products")
-    public List<Product> getProducts(@PathVariable String sellerId) {
-        return this.sellerService.getProducts(sellerId);
+    @GetMapping("{nickname}/product")
+    public List<ProductResponseDTO> getProducts(@PathVariable String nickname) {
+        return this.sellerService.getProducts(nickname);
     }
 
-    @GetMapping("{sellerId}/product/{productName}")
-    public Product getProductByName(@PathVariable String sellerId, @PathVariable String productName) {
-        return this.sellerService.getProductByName(sellerId, productName);
+    @GetMapping("{nickname}/product/{productName}")
+    public ProductResponseDTO getProductByName(@PathVariable String nickname, @PathVariable String productName) {
+        return this.sellerService.getProductByName(nickname, productName);
     }
 
-    @PostMapping("{sellerId}/product")
-    public Product addProduct(@PathVariable String sellerId, @RequestBody Product product) {
-        return this.sellerService.addProduct(sellerId, product);
+    @PostMapping("{nickname}/product")
+    public ProductResponseDTO addProduct(@PathVariable String nickname, @RequestBody ProductSaveDTO product) {
+        return this.sellerService.addProduct(nickname, product);
     }
 
-    @PutMapping("{sellerId}/product/{productId}")
-    public Product updateProduct(@PathVariable String sellerId, @PathVariable String productId, @RequestBody Product product) {
-        return this.sellerService.updateProduct(sellerId, productId, product);
+    @PutMapping("{nickname}/product/{productId}")
+    public ProductResponseDTO updateProduct(@PathVariable String nickname, @PathVariable String productId, @RequestBody Product product) {
+        return this.sellerService.updateProduct(nickname, productId, product);
     }
 
-    @DeleteMapping("{sellerId}/product/{productId}")
-    public void deleteProduct(@PathVariable String sellerId, @PathVariable String productId) {
-        this.sellerService.deleteProduct(sellerId, productId);
+    @DeleteMapping("{nickname}/product/{productId}")
+    public void deleteProduct(@PathVariable String nickname, @PathVariable String productId) {
+        this.sellerService.deleteProduct(nickname, productId);
     }
 
 }

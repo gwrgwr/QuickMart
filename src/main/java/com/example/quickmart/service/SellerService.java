@@ -1,10 +1,14 @@
 package com.example.quickmart.service;
 
 import com.example.quickmart.domain.product.Product;
+import com.example.quickmart.domain.product.dto.request.ProductSaveDTO;
+import com.example.quickmart.domain.product.dto.response.ProductResponseDTO;
 import com.example.quickmart.domain.seller.Seller;
 import com.example.quickmart.domain.seller.dto.request.SellerSaveDTO;
 import com.example.quickmart.domain.seller.dto.request.SellerUpdateDTO;
 import com.example.quickmart.domain.seller.dto.response.SellerResponseDTO;
+import com.example.quickmart.exceptions.seller.SellerNotFoundException;
+import com.example.quickmart.mapper.ProductMapper;
 import com.example.quickmart.mapper.SellerMapper;
 import com.example.quickmart.repositories.SellerRepository;
 import org.springframework.stereotype.Service;
@@ -28,27 +32,31 @@ public class SellerService {
         }
     }
 
-    public SellerResponseDTO getSellerByName(String name) {
-        return this.sellerRepository.findByEmail(name).map(SellerMapper::toSellerResponseDTO).orElseThrow();
+    public Seller getSellerByNickname(String nickname) {
+        return this.sellerRepository.findByNickname(nickname).orElseThrow(SellerNotFoundException::new);
     }
 
-    public Seller getSellerByEmail(String email) {
-        return this.sellerRepository.findByEmail(email).orElseThrow();
+    public Seller getSellerByEmailForLogin(String email) {
+        return this.sellerRepository.findByEmail(email).orElse(null);
+    }
+
+    public SellerResponseDTO getSellerByEmailForSearch(String email) {
+        return this.sellerRepository.findByEmail(email).map(SellerMapper::toSellerResponseDTO).orElseThrow(SellerNotFoundException::new);
     }
 
     public Seller getSellerById(String id) {
-        return this.sellerRepository.findById(id).orElseThrow();
+        return this.sellerRepository.findById(id).orElseThrow(SellerNotFoundException::new);
     }
 
     public SellerResponseDTO saveSeller(SellerSaveDTO data) {
-        Seller seller = new Seller(data.name(), data.username(), data.email(), data.password());
+        Seller seller = new Seller(data.name(), data.username(), data.email(), data.password(), data.nickname());
         this.sellerRepository.save(seller);
         return SellerMapper.toSellerResponseDTO(seller);
     }
 
     public SellerResponseDTO updateSeller(String sellerId, SellerUpdateDTO data) {
         Seller seller = this.getSellerById(sellerId);
-        seller.setName(data.name());
+        seller.setFullName(data.name());
         seller.setUsername(data.username());
         seller.setEmail(data.email());
         this.sellerRepository.save(seller);
@@ -56,38 +64,41 @@ public class SellerService {
     }
 
     public void deleteSeller(String sellerId) {
-        Seller seller = this.getSellerById(sellerId);
-        this.sellerRepository.delete(seller);
+        this.sellerRepository.delete(this.getSellerById(sellerId));
     }
 
-    public Product getProductByName(String sellerId, String name) {
-        Seller seller = this.getSellerById(sellerId);
+    // Product
+
+    public ProductResponseDTO getProductByName(String nickname, String name) {
+        Seller seller = this.getSellerByNickname(nickname);
         Product product = this.productService.getProductByName(name);
         validateProductBelongsToSeller(product, seller);
-        return product;
+        return ProductMapper.toProductResponseDTO(product);
     }
 
-    public List<Product> getProducts(String sellerId) {
-        Seller seller = this.getSellerById(sellerId);
-        return this.productService.getProductsBySeller(seller);
+    public List<ProductResponseDTO> getProducts(String nickname) {
+        Seller seller = this.getSellerByNickname(nickname);
+        List<Product> productList = this.productService.getProductsBySeller(seller);
+        return ProductMapper.toProductResponseDTOList(productList);
     }
 
-    public Product addProduct(String sellerId, Product product) {
-        Seller seller = this.getSellerById(sellerId);
+    public ProductResponseDTO addProduct(String nickname, ProductSaveDTO data) {
+        Seller seller = this.getSellerByNickname(nickname);
+        Product product = ProductMapper.toProduct(data, seller);
         validateProductBelongsToSeller(product, seller);
-        return this.productService.saveProduct(product, seller);
+        return ProductMapper.toProductResponseDTO(this.productService.saveProduct(ProductMapper.toProductSaveDTO(product), seller));
     }
 
-    public Product updateProduct(String sellerId, String productId, Product product) {
+    public ProductResponseDTO updateProduct(String nickname, String productId, Product product) {
         Product existingProduct = this.productService.getProductById(productId);
-        Seller seller = this.getSellerById(sellerId);
+        Seller seller = this.getSellerByNickname(nickname);
         validateProductBelongsToSeller(existingProduct, seller);
-        return this.productService.saveProduct(product, seller);
+        return ProductMapper.toProductResponseDTO(this.productService.saveProduct(ProductMapper.toProductSaveDTO(product), seller));
     }
 
-    public void deleteProduct(String sellerId, String productId) {
+    public void deleteProduct(String nickname, String productId) {
         Product existingProduct = this.productService.getProductById(productId);
-        Seller seller = this.getSellerById(sellerId);
+        Seller seller = this.getSellerByNickname(nickname);
         validateProductBelongsToSeller(existingProduct, seller);
         this.productService.deleteProduct(existingProduct, seller);
     }

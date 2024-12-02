@@ -41,4 +41,14 @@ public class Product {
 
     @Positive(message = "Rating must be positive")
     private Double rating;
+
+    public Product(String name, String description, Double price, Double stock, String category, Seller seller) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.stock = stock;
+        this.category = category;
+        this.seller = seller;
+        this.rating = 0.0;
+    }
 }

@@ -1,4 +1,4 @@
-package com.example.quickmart.domain.user.dto.response;
+package com.example.quickmart.dto;
 
 public record LoginResponseDTO(String token, String id, String email, String name) {
 }

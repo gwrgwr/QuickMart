@@ -18,8 +18,6 @@ public class ClientService {
     }
 
     public Client getClientByEmail(String email) {
-        return this.clientRepository.findByEmail(email).orElseThrow();
+        return this.clientRepository.findByEmail(email).orElse(null);
     }
-
-
 }

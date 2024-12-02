@@ -1,6 +1,5 @@
 package com.example.quickmart.config.security;
 
-import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -39,19 +38,6 @@ public class SecurityConfig {
     private RSAPublicKey publicKey;
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("api/v1/auth/login", "api/v1/seller").permitAll()
-                        .anyRequest().authenticated())
-                .oauth2ResourceServer(auth -> auth.jwt(Customizer.withDefaults()))
-                .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
-                .build();
-    }
-
-     @Bean
     static RoleHierarchy roleHierarchy() {
         return RoleHierarchyImpl.withRolePrefix("SCOPE_")
                 .role("ADMIN").implies("SELLER")
@@ -64,6 +50,19 @@ public class SecurityConfig {
         DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
         expressionHandler.setRoleHierarchy(roleHierarchy);
         return expressionHandler;
+    }
+
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("api/v1/auth/login", "api/v1/seller").permitAll()
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(auth -> auth.jwt(Customizer.withDefaults()))
+                .csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable())
+                .build();
     }
 
     @Bean

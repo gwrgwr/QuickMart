@@ -1,10 +1,12 @@
 package com.example.quickmart.service;
 
 import com.example.quickmart.domain.client.Client;
+import com.example.quickmart.domain.client.dto.ClientLoginResponseDTO;
 import com.example.quickmart.domain.seller.Seller;
-import com.example.quickmart.domain.user.dto.request.LoginRequestDTO;
-import com.example.quickmart.domain.user.dto.response.LoginResponseDTO;
+import com.example.quickmart.domain.seller.dto.response.SellerLoginResponseDTO;
 import com.example.quickmart.domain.user.UserEntity;
+import com.example.quickmart.domain.user.dto.request.LoginRequestDTO;
+import com.example.quickmart.dto.LoginResponseDTO;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,7 +34,7 @@ public class AuthService {
             return client;
         }
 
-        Seller seller = sellerService.getSellerByEmail(email);
+        Seller seller = sellerService.getSellerByEmailForLogin(email);
         if (seller != null) {
             return seller;
         }
@@ -40,14 +42,19 @@ public class AuthService {
         throw new UsernameNotFoundException("User not found with email: " + email);
     }
 
-    public LoginResponseDTO login(LoginRequestDTO data) {
-        UserEntity user = findUserByEmail(data.username());
+    public Object login(LoginRequestDTO data) {
+        UserEntity user = findUserByEmail(data.email());
         if (!bCryptPasswordEncoder.matches(data.password(), user.getPassword())) {
             throw new IllegalArgumentException("Invalid password");
         }
         String token = tokenService.generateLoginToken(user);
         Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new LoginResponseDTO(token, user.getId(), user.getEmail(), user.getName());
+        LoginResponseDTO loginResponse = new LoginResponseDTO(token, user.getId(), user.getEmail(), user.getFullName());
+        if (user instanceof Client) {
+            return new ClientLoginResponseDTO(loginResponse, user.getRole().getRole());
+        } else {
+            return new SellerLoginResponseDTO(loginResponse, user.getRole().getRole(), ((Seller) user).getNickname());
+        }
     }
 }
