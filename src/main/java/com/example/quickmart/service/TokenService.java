@@ -24,7 +24,7 @@ public class TokenService {
 
         var claims = JwtClaimsSet.builder()
                 .subject(user.getId())
-                .claim("scope", user.getRole().name())
+                .claim("scope", user.getRole().name() + " " + "USER")
                 .issuer("quickmart")
                 .expiresAt(expirationTime)
                 .issuedAt(now)

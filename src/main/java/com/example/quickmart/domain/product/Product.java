@@ -1,7 +1,9 @@
 package com.example.quickmart.domain.product;
 
+import com.example.quickmart.domain.client.Client;
 import com.example.quickmart.domain.image.ImageDB;
 import com.example.quickmart.domain.seller.Seller;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -41,7 +43,13 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "seller_id")
+    @JsonIgnore
     private Seller seller;
+
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    @JsonIgnore
+    private Client client;
 
     @Positive(message = "Rating must be positive")
     private Double rating;

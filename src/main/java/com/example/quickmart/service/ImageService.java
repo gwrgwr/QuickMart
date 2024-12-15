@@ -1,15 +1,16 @@
 package com.example.quickmart.service;
 
 import com.example.quickmart.domain.image.ImageDB;
+import com.example.quickmart.domain.product.Product;
 import com.example.quickmart.repositories.ImageRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 @Service
 public class ImageService {
@@ -19,18 +20,20 @@ public class ImageService {
         this.imageRepository = imageRepository;
     }
 
-    public void store(MultipartFile file, String productId) throws IOException {
+    public ImageDB store(MultipartFile file, Product product) throws IOException {
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-        ImageDB image = new ImageDB(fileName, file.getContentType(), file.getBytes());
-        System.out.println(Arrays.toString(file.getBytes()));
-        imageRepository.save(image);
+        return this.imageRepository.save(new ImageDB(fileName, file.getContentType(), file.getBytes(), product));
+    }
+
+    public List<ImageDB> storeMultiple(MultipartFile[] files, Product product) throws IOException {
+        List<ImageDB> images = new ArrayList<>(List.of());
+        for (MultipartFile file : files) {
+            images.add(store(file, product));
+        }
+        return images;
     }
 
     public ImageDB getImage(String id) {
         return imageRepository.findById(id).orElseThrow();
-    }
-
-    public Stream<ImageDB> getAllFiles() {
-        return imageRepository.findAll().stream();
     }
 }

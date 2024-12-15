@@ -1,6 +1,7 @@
 package com.example.quickmart.domain.image;
 
 import com.example.quickmart.domain.product.Product;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public class ImageDB {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id")
+    @JsonIgnore
     private Product product;
 
     @PrePersist

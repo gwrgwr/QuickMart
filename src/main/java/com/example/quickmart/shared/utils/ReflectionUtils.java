@@ -1,4 +1,4 @@
-package com.example.quickmart.utils;
+package com.example.quickmart.shared.utils;
 
 import java.lang.reflect.Method;
 

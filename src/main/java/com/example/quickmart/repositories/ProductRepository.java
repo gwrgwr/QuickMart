@@ -11,4 +11,6 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     List<Product> findBySeller(Seller seller);
 
     Optional<Product> findByNameLike(String name);
+
+    boolean existsByNameAndSeller(String name, Seller seller);
 }

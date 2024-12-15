@@ -1,4 +1,4 @@
-package com.example.quickmart.dto;
+package com.example.quickmart.shared.dto;
 
 import org.springframework.http.HttpStatus;
 

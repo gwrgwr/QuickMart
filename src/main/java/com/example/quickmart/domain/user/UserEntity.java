@@ -9,7 +9,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -36,6 +35,9 @@ public class UserEntity implements UserDetails {
 
     private String password;
 
+    @Column(nullable = false, unique = true)
+    private String nickname;
+
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
@@ -43,11 +45,12 @@ public class UserEntity implements UserDetails {
 
     private LocalDateTime updatedAt;
 
-    public UserEntity(String fullName, String username, String email, String password, UserRole role) {
+    public UserEntity(String fullName, String username, String email, String password, String nickname, UserRole role) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.password = password;
+        this.nickname = nickname;
         this.role = role;
     }
 
@@ -82,10 +85,12 @@ public class UserEntity implements UserDetails {
                     () -> "SCOPE_CLIENT",
                     () -> "SCOPE_SELLER");
             case CLIENT -> List.of(
-                    () -> "SCOPE_CLIENT"
+                    () -> "SCOPE_CLIENT",
+                    () -> "SCOPE_USER"
             );
             case SELLER -> List.of(
-                    () -> "SCOPE_SELLER");
+                    () -> "SCOPE_SELLER",
+                    () -> "SCOPE_USER");
         };
     }
 
