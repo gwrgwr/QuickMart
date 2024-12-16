@@ -6,9 +6,9 @@ spring:
             enabled: true
     data:
         mongodb:
-            uri: mongodb://mongo:27017/quickmart
+            uri: mongodb://localhost:27017/quickmart
     datasource:
-        url: jdbc:mysql://mysql:3306/quickmart
+        url: jdbc:mysql://localhost:3307/quickmart
         username: root
         password:
         driver-class-name: com.mysql.cj.jdbc.Driver
@@ -20,7 +20,7 @@ spring:
     jpa:
         hibernate:
             ddl-auto: update
-            dialect: org.hibernate.dialect.MySQL8Dialect
+        database-platform: org.hibernate.dialect.MySQL8Dialect
         show-sql: true
     flyway:
         enabled: true
