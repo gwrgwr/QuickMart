@@ -56,6 +56,6 @@
 
 <ol>
   <li><strong>Login</strong>: O cliente ou vendedor realiza o login utilizando OAuth2.</li>
-  <li><strong>Autorização</strong>: O cliente é redirecionado para um provedor de autenticação (Google, Facebook, etc.) e, ao ser autenticado, o token é retornado.</li>
+  <li><strong>Autorização</strong>: O cliente é redirecionado para um provedor de autenticação (por private e public key) e, ao ser autenticado, o token é retornado.</li>
   <li><strong>Acesso Autorizado</strong>: Após a autenticação, o cliente ou vendedor tem acesso às suas informações e funcionalidades dentro da plataforma.</li>
 </ol>
